@@ -20,10 +20,6 @@ public class Token {
     public int getRow() {
 		return row;
 	}
-	
-	public void setRow(int row) {
-		this.row = row;
-	}
 
 	public TokenType getType() {
 		return type;
@@ -35,10 +31,6 @@ public class Token {
 
 	public String getValue() {
 		return value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
 	}
     
 	public String toString() {
