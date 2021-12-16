@@ -1,6 +1,7 @@
 package exception;
 
-public class SyntacticException extends InternalException {
+public class SyntacticException extends Exception {
+    
     public SyntacticException(String message, Throwable innerException) {
         super(message, innerException);
     }
