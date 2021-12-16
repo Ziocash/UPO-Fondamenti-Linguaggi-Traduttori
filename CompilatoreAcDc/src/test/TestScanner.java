@@ -1,13 +1,10 @@
 package test;
 
-import static java.lang.System.out;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.junit.Test;
@@ -25,34 +22,34 @@ public class TestScanner {
 		Scanner scanner = new Scanner(path);
 		Token token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.TYINT);
-		assertEquals(token.getRow(), 1);
+		assertEquals(1, token.getRow());
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.TYFLOAT);
-		assertEquals(token.getRow(), 2);
+		assertEquals(2, token.getRow());
 		token = scanner.nextToken();
 		assertFalse(token.getType() == TokenType.TYFLOAT);
 		assertTrue(token.getType() == TokenType.ID);
-		assertEquals(token.getRow(), 2);
+		assertEquals(2, token.getRow());
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.PRINT);
-		assertEquals(token.getRow(), 3);
+		assertEquals(3, token.getRow());
 		token = scanner.nextToken();
 		assertFalse(token.getType() == TokenType.PRINT);
 		assertTrue(token.getType() == TokenType.ID);
-		assertEquals(token.getRow(), 3);
+		assertEquals(3, token.getRow());
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.ID);
-		assertEquals(token.getRow(), 4);
+		assertEquals(4, token.getRow());
 		token = scanner.nextToken();
 		assertFalse(token.getType() == TokenType.TYINT);
 		assertTrue(token.getType() == TokenType.ID);
-		assertEquals(token.getRow(), 5);
+		assertEquals(5, token.getRow());
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.TYINT);
-		assertEquals(token.getRow(), 6);
+		assertEquals(6, token.getRow());
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.ID);
-		assertEquals(token.getRow(), 6);
+		assertEquals(6, token.getRow());
 	}
 
 	@Test
@@ -61,23 +58,23 @@ public class TestScanner {
 		Scanner scanner = new Scanner(path);
 		Token token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.INT);
-		assertEquals(token.getValue(), "30000");
-		assertEquals(token.getRow(), 1);
+		assertEquals("30000", token.getValue());
+		assertEquals(1, token.getRow());
 		assertThrows(LexicalException.class, () -> {
 			scanner.nextToken();
 		});
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.FLOAT);
-		assertEquals(token.getValue(), "13.454");
-		assertEquals(token.getRow(), 4);
+		assertEquals("13.454", token.getValue());
+		assertEquals(4, token.getRow());
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.FLOAT);
-		assertEquals(token.getValue(), "098.895");
-		assertEquals(token.getRow(), 4);
+		assertEquals("098.895", token.getValue());
+		assertEquals(4, token.getRow());
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.INT);
-		assertEquals(token.getValue(), "45668");
-		assertEquals(token.getRow(), 5);
+		assertEquals("45668", token.getValue());
+		assertEquals(5, token.getRow());
 		assertThrows(LexicalException.class, () -> {
 			scanner.nextToken();
 		});
@@ -86,7 +83,7 @@ public class TestScanner {
 		});
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.EOF);
-		assertEquals(token.getRow(), 8);
+		assertEquals(8, token.getRow());
 	}
 
 	@Test
@@ -95,17 +92,109 @@ public class TestScanner {
 		Scanner scanner = new Scanner(path);
 		Token token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.EOF);
-		assertEquals(token.getRow(), 3);
+		assertEquals(3, token.getRow());
 	}
 
 	@Test
 	public void testPeekToken() throws IOException, LexicalException {
-		String path = "C:\\Users\\Simone Gattini\\source\\repos\\UPO-Fondamenti-Linguaggi-Traduttori\\CompilatoreAcDc\\src\\test\\data\\testNumbers.txt";
+		String path = "C:\\Users\\Simone Gattini\\source\\repos\\UPO-Fondamenti-Linguaggi-Traduttori\\CompilatoreAcDc\\src\\test\\data\\testPeek.txt";
 		Scanner scanner = new Scanner(path);
 		Token token = scanner.nextToken();
 		assertEquals(token, scanner.peekToken());
+		assertEquals(1, token.getRow());
+		assertEquals("15", token.getValue());
 		token = scanner.nextToken();
 		assertEquals(token, scanner.peekToken());
+		assertEquals(1, token.getRow());
+		assertEquals("14", token.getValue());
 	}
 
+	@Test
+	public void testOperators() throws IOException, LexicalException {
+		String path = "C:\\Users\\Simone Gattini\\source\\repos\\UPO-Fondamenti-Linguaggi-Traduttori\\CompilatoreAcDc\\src\\test\\data\\testOperators.txt";
+		Scanner scanner = new Scanner(path);
+		Token token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.PLUS);
+		assertEquals(1, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.MINUS);
+		assertEquals(2, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.TIMES);
+		assertEquals(2, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.DIV);
+		assertEquals(3, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.ASSIGN);
+		assertEquals(8, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.SEMI);
+		assertEquals(10, token.getRow());
+	}
+
+	@Test
+	public void testAllTokens() throws IOException, LexicalException {
+		String path = "C:\\Users\\Simone Gattini\\source\\repos\\UPO-Fondamenti-Linguaggi-Traduttori\\CompilatoreAcDc\\src\\test\\data\\testGeneral.txt";
+		Scanner scanner = new Scanner(path);
+		Token token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.TYINT);
+		assertEquals(2, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.ID);
+		assertEquals(2, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.SEMI);
+		assertEquals(2, token.getRow());
+		//
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.ID);
+		assertEquals(3, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.ASSIGN);
+		assertEquals(3, token.getRow());
+		assertThrows(LexicalException.class, () -> {
+			scanner.nextToken();
+		});
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.SEMI);
+		assertEquals(3, token.getRow());
+		//
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.TYFLOAT);
+		assertEquals(5, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.ID);
+		assertEquals(5, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.SEMI);
+		assertEquals(5, token.getRow());
+		//
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.ID);
+		assertEquals(6, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.ASSIGN);
+		assertEquals(6, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.ID);
+		assertEquals(6, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.PLUS);
+		assertEquals(6, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.FLOAT);
+		assertEquals(6, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.SEMI);
+		assertEquals(6, token.getRow());
+		//
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.PRINT);
+		assertEquals(7, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.ID);
+		assertEquals(7, token.getRow());
+
+	}
 }

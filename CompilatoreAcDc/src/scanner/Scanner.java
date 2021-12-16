@@ -4,17 +4,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PushbackReader;
-import java.lang.management.OperatingSystemMXBean;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.lang.model.util.ElementScanner6;
-import javax.xml.catalog.Catalog;
-
 import exception.LexicalException;
-import token.*;
+import token.Token;
+import token.TokenType;
 
 public class Scanner {
 	final char EOF = (char) -1; // int 65535
@@ -100,6 +96,7 @@ public class Scanner {
 
 			if (operatorsMap.containsKey(peekChar())) {
 				token = new Token(operatorsMap.get(peekChar()), row);
+				readChar();
 				return token;
 			}
 			readChar();
