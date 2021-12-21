@@ -132,7 +132,7 @@ public class Scanner {
 	// che legge tutte le lettere minuscole e ritorna un Token ID o
 	// il Token associato Parola Chiave (per generare i Token per le
 	// parole chiave usate l'HashMap di corrispondenza
-	private Token scanId() throws IOException, LexicalException {
+	private Token scanId() throws IOException {
 		StringBuilder sb = new StringBuilder();
 		while (letters.contains(peekChar())) {
 			sb.append(readChar());
@@ -140,7 +140,7 @@ public class Scanner {
 
 		if (keyWordsMap.containsKey(sb.toString()))
 			return new Token(keyWordsMap.get(sb.toString()), row);
-		return new Token(TokenType.ID, row);
+		return new Token(TokenType.ID, row, sb.toString());
 	}
 
 	private char readChar() throws IOException {
