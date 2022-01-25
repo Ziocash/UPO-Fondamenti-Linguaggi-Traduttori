@@ -1,5 +1,7 @@
 package ast;
 
+import visitor.IVisitor;
+
 public class NodeBinOp extends NodeExpr {
 
     private NodeExpr leftOp;
@@ -25,8 +27,21 @@ public class NodeBinOp extends NodeExpr {
         return op;
     }
 
+    public void setLeftOp(NodeExpr leftOp) {
+        this.leftOp = leftOp;
+    }
+
+    public void setRightOp(NodeExpr rightOp) {
+        this.rightOp = rightOp;
+    }
+
     @Override
     public String toString() {
         return "[BinOp:" + leftOp.toString() + "," +  op.toString() + "," + rightOp.toString() + "]";
+    }
+
+    @Override
+    public void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 }

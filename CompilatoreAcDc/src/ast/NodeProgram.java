@@ -3,6 +3,8 @@ package ast;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import visitor.IVisitor;
+
 public class NodeProgram extends NodeAST implements Iterable<NodeDecSt> {
 
     private ArrayList<NodeDecSt> decSts;
@@ -25,6 +27,11 @@ public class NodeProgram extends NodeAST implements Iterable<NodeDecSt> {
             builder.append(node.toString());
         }
         return "[Program:" + builder.toString() + "]";
+    }
+
+    @Override
+    public void accept(IVisitor visitor) {
+        visitor.visit(this);
     }
 
 }
