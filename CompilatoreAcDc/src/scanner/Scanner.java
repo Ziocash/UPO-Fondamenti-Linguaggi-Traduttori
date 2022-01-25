@@ -13,10 +13,9 @@ import token.Token;
 import token.TokenType;
 
 public class Scanner {
-	final char EOF = (char) -1; // int 65535
+	private static final char EOF = (char) -1; // int 65535
 	private int row = 1;
 	private PushbackReader buffer;
-	private String log;
 
 	private Token token = null;
 
@@ -27,6 +26,12 @@ public class Scanner {
 	private HashMap<Character, TokenType> operatorsMap; // '+', '-', '*', '/', '=', ';'
 	private HashMap<String, TokenType> keyWordsMap; // "print", "float", "int"
 
+	/**
+	 * Creates a new {@code Scanner} and set up methods to tokenize given file 
+	 * 
+	 * @param fileName The name of file to be read
+	 * @throws FileNotFoundException If the named file does not exist, is a directory rather than a regular file, or for some other reason cannot be opened for reading.
+	 */
 	public Scanner(String fileName) throws FileNotFoundException {
 		this.buffer = new PushbackReader(new FileReader(fileName));
 		row = 1;
@@ -54,12 +59,26 @@ public class Scanner {
 		};
 	}
 
+	/**
+	 * Returns the actual token, if token is {@code null} returns the next one 
+	 * 
+	 * @return The actual token, if token is {@code null} returns the next one
+	 * @throws IOException If an I/O error occurs
+	 * @throws LexicalException If code is lexically incorrect
+	 */
 	public Token peekToken() throws IOException, LexicalException {
 		if (token == null)
 			token = nextToken();
 		return token;
 	}
 
+	/**
+	 * Returns the next token 
+	 * 
+	 * @return The next token
+	 * @throws IOException If an I/O error occurs
+	 * @throws LexicalException If code is lexically incorrect
+	 */
 	public Token nextToken() throws IOException, LexicalException {
 		// Avanza nel buffer leggendo i carattere in skipChars
 		// incrementando riga se leggi '\n'.
@@ -105,6 +124,13 @@ public class Scanner {
 		throw new LexicalException("Illegal character in row " + row);
 	}
 
+	/**
+	 * Returns a token that represents a numeric value (int or float with max 5 decimals).
+	 * 
+	 * @return The token representing a numeric value (int or float with 5 decimals).
+	 * @throws IOException If an I/O error occurs
+	 * @throws LexicalException If code is lexically incorrect
+	 */
 	private Token scanNumber() throws IOException, LexicalException {
 		StringBuilder result = new StringBuilder();
 		while (numbers.contains(peekChar())) {
@@ -127,11 +153,12 @@ public class Scanner {
 
 	}
 
-	// Se nextChar e' in letters
-	// return scanId()
-	// che legge tutte le lettere minuscole e ritorna un Token ID o
-	// il Token associato Parola Chiave (per generare i Token per le
-	// parole chiave usate l'HashMap di corrispondenza
+	/**
+	 * Returns a token that represents an Id (variable or keyword)
+	 * 
+	 * @return The token that represents a Id (variable or keyword)
+	 * @throws IOException If an I/O error occurs
+	 */
 	private Token scanId() throws IOException {
 		StringBuilder sb = new StringBuilder();
 		while (letters.contains(peekChar())) {
@@ -143,10 +170,22 @@ public class Scanner {
 		return new Token(TokenType.ID, row, sb.toString());
 	}
 
+	/**
+	 * Reads a char and consumes it
+	 * 
+	 * @return The read character
+	 * @throws IOException If an I/O error occurs
+	 */
 	private char readChar() throws IOException {
 		return ((char) this.buffer.read());
 	}
 
+	/**
+	 * Reads a char without consuming it
+	 * 
+	 * @return The read character
+	 * @throws IOException If an I/O error occurs
+	 */
 	private char peekChar() throws IOException {
 		char c = (char) buffer.read();
 		buffer.unread(c);
