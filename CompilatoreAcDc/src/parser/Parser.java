@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import ast.LangOper;
 import ast.LangType;
+import ast.NodeAssign;
 import ast.NodeBinOp;
 import ast.NodeConst;
 import ast.NodeDecSt;
@@ -137,9 +138,12 @@ public class Parser {
                 match(TokenType.ID);
                 match(TokenType.SEMI);
                 return new NodeDecl(LangType.INT, name);
+            default:
+                throw new SyntacticException(
+                        String.format("Unexpected token \'%s\' at line %d", token.getValue(), token.getRow()));
+
         }
-        throw new SyntacticException(
-                String.format("Unexpected token \'%s\' at line %d", token.getValue(), token.getRow()));
+
     }
 
     /**
@@ -157,19 +161,17 @@ public class Parser {
             throw new SyntacticException(scanErrorMessage, e);
         }
         switch (token.getType()) {
+            case ID:
+                match(TokenType.ID);
+                match(TokenType.ASSIGN);
+                NodeExpr expr = parseExp();
+                match(TokenType.SEMI);
+                return new NodeAssign(new NodeId(token.getValue()), expr);
             case PRINT:
                 Token tk = match(TokenType.PRINT);
                 match(TokenType.ID);
                 match(TokenType.SEMI);
                 return new NodePrint(new NodeId(tk.getValue()));
-            case ID:
-                match(TokenType.ID);
-                token = match(TokenType.ASSIGN);
-                if (token.getType() == TokenType.INT)
-                    match(TokenType.INT);
-                else
-                    match(TokenType.FLOAT);
-                return null;
             default:
                 String string = String.format("Unexpected token \'%s\' at line %d", token.getType(), token.getRow());
                 throw new SyntacticException(string);
@@ -217,13 +219,15 @@ public class Parser {
             case PLUS:
                 match(TokenType.PLUS);
                 NodeExpr terP = parseTr();
-                NodeExpr expP = parseExpP(leftOp);
-                return new NodeBinOp(terP, expP, LangOper.PLUS);
+                NodeExpr opP = new NodeBinOp(leftOp, terP, LangOper.PLUS);
+                NodeExpr expP = parseExpP(opP);
+                return expP;
             case MINUS:
                 match(TokenType.MINUS);
                 NodeExpr terM = parseTr();
-                NodeExpr expM = parseExpP(leftOp);
-                return new NodeBinOp(terM, expM, LangOper.MINUS);
+                NodeExpr opM = new NodeBinOp(leftOp, terM, LangOper.MINUS);
+                NodeExpr expM = parseExpP(opM);
+                return expM;
             case SEMI:
                 return leftOp;
             default:
@@ -248,8 +252,8 @@ public class Parser {
             case FLOAT:
             case ID:
                 NodeExpr left = parseVal();
-                parseTrP(left);
-                return null;
+                NodeExpr expr = parseTrP(left);
+                return expr;
             default:
                 throw new SyntacticException("");
         }
@@ -271,14 +275,16 @@ public class Parser {
         switch (token.getType()) {
             case TIMES:
                 match(TokenType.TIMES);
-                NodeExpr left = parseVal();
-                NodeExpr right = parseTrP(left);
-                return new NodeBinOp(left, right, LangOper.TIMES);
-            case FLOAT:
+                NodeExpr valT = parseVal();
+                NodeExpr opT = new NodeBinOp(leftOp, valT, LangOper.TIMES);
+                NodeExpr expT = parseTrP(opT);
+                return expT;
+            case DIV:
                 match(TokenType.DIV);
-                left = parseVal();
-                right = parseTrP(left);
-                return new NodeBinOp(left, right, LangOper.DIV);
+                NodeExpr valD = parseVal();
+                NodeExpr opD = new NodeBinOp(leftOp, valD, LangOper.DIV);
+                NodeExpr expD = parseTrP(opD);
+                return expD;
             case PLUS:
             case MINUS:
             case SEMI:
@@ -302,14 +308,14 @@ public class Parser {
         }
         switch (token.getType()) {
             case INT:
-                token = match(TokenType.INT);
+                match(TokenType.INT);
                 return new NodeConst(token.getValue(), LangType.INT);
             case FLOAT:
                 match(TokenType.FLOAT);
                 return new NodeConst(token.getValue(), LangType.FLOAT);
             case ID:
-                Token temp = match(TokenType.ID);
-                return new NodeDeref(new NodeId(temp.getValue()));
+                match(TokenType.ID);
+                return new NodeDeref(new NodeId(token.getValue()));
             default:
                 throw new SyntacticException("");
         }
