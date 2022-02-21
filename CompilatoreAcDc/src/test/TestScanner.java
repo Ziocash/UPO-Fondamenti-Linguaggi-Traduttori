@@ -195,6 +195,9 @@ public class TestScanner {
 		token = scanner.nextToken();
 		assertTrue(token.getType() == TokenType.ID);
 		assertEquals(7, token.getRow());
+		token = scanner.nextToken();
+		assertTrue(token.getType() == TokenType.SEMI);
+		assertEquals(7, token.getRow());
 
 	}
 }
