@@ -24,3 +24,4 @@ hs_err_pid*
 
 # .vscode subfolder
 .vscode/
+CompilatoreAcDc/src/test/data/output.txt

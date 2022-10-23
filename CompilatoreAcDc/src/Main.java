@@ -29,6 +29,8 @@ public class Main {
                     try (var writer = new FileWriter(chooser.getSelectedFile().getAbsolutePath())) {
                         writer.write(codeGenVisitor.getCode());
                     }
+                    logger.log(Level.INFO, codeGenVisitor.getCode());
+                    logger.log(Level.INFO, "Has errors: {0}", typeVisitor.hasErrors());
                 } else
                     logger.log(Level.SEVERE, typeVisitor.getLoggerString());
             }
