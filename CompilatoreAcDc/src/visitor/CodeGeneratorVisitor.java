@@ -217,7 +217,7 @@ public class CodeGeneratorVisitor implements IVisitor {
     @Override
     public void visit(NodePrint node) {
         char reg = node.getId().getDefinition().getRegister();
-        code.append("l" + reg + "p P ");
+        code.append("l" + reg + " p P ");
     }
 
     /**
