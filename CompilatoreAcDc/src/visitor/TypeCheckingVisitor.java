@@ -150,10 +150,10 @@ public class TypeCheckingVisitor implements IVisitor {
     public void visit(NodeBinOp node) {
         node.getLeftOp().accept(this);
         node.getRightOp().accept(this);
-        if (node.getLeftOp().getResType() == TypeDescriptor.ERROR
-                || node.getRightOp().getResType() == TypeDescriptor.ERROR) {
+        if (node.getLeftOp().getResType().equals(TypeDescriptor.ERROR)
+                || node.getRightOp().getResType().equals(TypeDescriptor.ERROR)) {
             node.setResType(TypeDescriptor.ERROR);
-        } else if (node.getLeftOp().getResType() == node.getRightOp().getResType()) {
+        } else if (node.getLeftOp().getResType().equals(node.getRightOp().getResType())) {
             node.setResType(node.getLeftOp().getResType());
         } else if (isCompatible(node.getLeftOp().getResType(), node.getRightOp().getResType())) {
             NodeExpr rightOp = convert(node.getRightOp());
@@ -227,15 +227,14 @@ public class TypeCheckingVisitor implements IVisitor {
     public void visit(NodeAssign node) {
         node.getId().accept(this);
         node.getExpr().accept(this);
-        if (node.getExpr().getResType() == TypeDescriptor.ERROR
-                || !isCompatible(node.getId().getResType(), node.getExpr().getResType())) {
+        if (isCompatible(node.getId().getResType(), node.getExpr().getResType())) {
+            if (!node.getId().getResType().equals(node.getExpr().getResType()))
+                convert(node.getExpr());
+            node.setResType(node.getExpr().getResType());
+        } else {
             node.setResType(TypeDescriptor.ERROR);
             logger.append(String.format("Assignment: Cannot assign \'%s\' type to \'%s\' type.%n",
                     node.getExpr().getResType(), node.getId().getResType()));
-        } else {
-            NodeExpr n = convert(node.getExpr());
-            node.setExpr(n);
-            node.setResType(n.getResType());
         }
     }
 
@@ -253,6 +252,11 @@ public class TypeCheckingVisitor implements IVisitor {
     @Override
     public void visit(NodeConvert node) {
         // Empty method
+        node.getExpr().accept(this);
+        if (node.getExpr().getResType().equals(TypeDescriptor.INT))
+            node.getExpr().setResType(TypeDescriptor.FLOAT);
+        else
+            node.getExpr().setResType(TypeDescriptor.ERROR);
     }
 
     /**
