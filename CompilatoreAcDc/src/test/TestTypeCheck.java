@@ -3,9 +3,10 @@ package test;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static java.lang.System.out;
 
 import java.io.FileNotFoundException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.junit.Test;
 
@@ -19,6 +20,7 @@ import visitor.TypeCheckingVisitor;
 
 public class TestTypeCheck {
 
+    private Logger logger = Logger.getLogger(this.getClass().getName());
     /**
      * Tests repeated declarations.
      * @throws FileNotFoundException Scanner source file not found.
@@ -32,8 +34,8 @@ public class TestTypeCheck {
         NodeProgram nP = parser.parse();
         var visitor = new TypeCheckingVisitor();
         nP.accept(visitor);
-        out.println(SymbolTable.toStr());
-        out.println(visitor.getLoggerString());
+        logger.log(Level.INFO, "{0}", SymbolTable.toStr());
+        logger.log(Level.INFO,visitor.getLoggerString());
         assertEquals(TypeDescriptor.ERROR, nP.getResType());
     }
 
@@ -50,8 +52,8 @@ public class TestTypeCheck {
         NodeProgram nP = parser.parse();
         var visitor = new TypeCheckingVisitor();
         nP.accept(visitor);
-        out.println(SymbolTable.toStr());
-        out.println(visitor.getLoggerString());
+        logger.log(Level.INFO, "{0}", SymbolTable.toStr());
+        logger.log(Level.INFO,visitor.getLoggerString());
         assertEquals(TypeDescriptor.VOID, nP.getResType());
     }
 
@@ -68,8 +70,8 @@ public class TestTypeCheck {
         NodeProgram nP = parser.parse();
         var visitor = new TypeCheckingVisitor();
         nP.accept(visitor);
-        out.println(SymbolTable.toStr());
-        out.println(visitor.getLoggerString());
+        logger.log(Level.INFO, "{0}", SymbolTable.toStr());
+        logger.log(Level.INFO,visitor.getLoggerString());
         assertEquals(TypeDescriptor.VOID, nP.getResType());
     }
 
@@ -86,8 +88,8 @@ public class TestTypeCheck {
         NodeProgram nP = parser.parse();
         var visitor = new TypeCheckingVisitor();
         nP.accept(visitor);
-        out.println(SymbolTable.toStr());
-        out.println(visitor.getLoggerString());
+        logger.log(Level.INFO, "{0}", SymbolTable.toStr());
+        logger.log(Level.INFO,visitor.getLoggerString());
         assertTrue(visitor.hasErrors());
     }
 
@@ -104,8 +106,8 @@ public class TestTypeCheck {
         NodeProgram nP = parser.parse();
         var visitor = new TypeCheckingVisitor();
         nP.accept(visitor);
-        out.println(SymbolTable.toStr());
-        out.println(visitor.getLoggerString());
+        logger.log(Level.INFO, "{0}", SymbolTable.toStr());
+        logger.log(Level.INFO,visitor.getLoggerString());
         assertTrue(visitor.hasErrors());
     }
 
@@ -122,8 +124,8 @@ public class TestTypeCheck {
         NodeProgram nP = parser.parse();
         var visitor = new TypeCheckingVisitor();
         nP.accept(visitor);
-        out.println(SymbolTable.toStr());
-        out.println(visitor.getLoggerString());
+        logger.log(Level.INFO, "{0}", SymbolTable.toStr());
+        logger.log(Level.INFO,visitor.getLoggerString());
         assertFalse(visitor.hasErrors());
     }
 
@@ -140,8 +142,8 @@ public class TestTypeCheck {
         NodeProgram nP = parser.parse();
         var visitor = new TypeCheckingVisitor();
         nP.accept(visitor);
-        out.println(SymbolTable.toStr());
-        out.println(visitor.getLoggerString());
+        logger.log(Level.INFO, "{0}", SymbolTable.toStr());
+        logger.log(Level.INFO,visitor.getLoggerString());
         assertTrue(visitor.hasErrors());
     }
 
@@ -158,8 +160,8 @@ public class TestTypeCheck {
         NodeProgram nP = parser.parse();
         var visitor = new TypeCheckingVisitor();
         nP.accept(visitor);
-        out.println(SymbolTable.toStr());
-        out.println(visitor.getLoggerString());
+        logger.log(Level.INFO, "{0}", SymbolTable.toStr());
+        logger.log(Level.INFO,visitor.getLoggerString());
         assertTrue(visitor.hasErrors());
     }
 }
