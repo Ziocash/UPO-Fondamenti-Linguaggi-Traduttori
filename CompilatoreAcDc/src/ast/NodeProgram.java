@@ -2,6 +2,7 @@ package ast;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import visitor.IVisitor;
 
@@ -9,9 +10,9 @@ public class NodeProgram extends NodeAST implements Iterable<NodeDecSt> {
 
     private ArrayList<NodeDecSt> decSts;
     
-    public NodeProgram(ArrayList<NodeDecSt> decSts) {
+    public NodeProgram(List<NodeDecSt> decSts) {
         super();
-        this.decSts = decSts;
+        this.decSts = new ArrayList<>(decSts);
     }
 
     @Override
