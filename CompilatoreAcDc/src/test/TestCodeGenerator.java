@@ -44,7 +44,6 @@ public class TestCodeGenerator {
             writer.write(codeGenVisitor.getCode());
         }
         String expected = "1.0 6 5 k / sb 0 k lb p P 1 6 / sa 0 k la p P la sb 0 k";
-        //String test =   "1.0 6 5 k / sb 0 k lb p P 1 6 / sa 0 k la p P";
         assertEquals(expected, codeGenVisitor.getCode());
     }
 }

@@ -227,15 +227,14 @@ public class TypeCheckingVisitor implements IVisitor {
     public void visit(NodeAssign node) {
         node.getId().accept(this);
         node.getExpr().accept(this);
-        if (node.getExpr().getResType() == TypeDescriptor.ERROR
-                || !isCompatible(node.getId().getResType(), node.getExpr().getResType())) {
+        if (isCompatible(node.getId().getResType(), node.getExpr().getResType())) {
+            if (!node.getId().getResType().equals(node.getExpr().getResType()))
+                convert(node.getExpr());
+            node.setResType(node.getExpr().getResType());
+        } else {
             node.setResType(TypeDescriptor.ERROR);
             logger.append(String.format("Assignment: Cannot assign \'%s\' type to \'%s\' type.%n",
                     node.getExpr().getResType(), node.getId().getResType()));
-        } else {
-            NodeExpr n = convert(node.getExpr());
-            node.setExpr(n);
-            node.setResType(n.getResType());
         }
     }
 
@@ -252,8 +251,9 @@ public class TypeCheckingVisitor implements IVisitor {
      */
     @Override
     public void visit(NodeConvert node) {
+        // Empty method
         node.getExpr().accept(this);
-        if(node.getExpr().getResType().equals(TypeDescriptor.INT))
+        if (node.getExpr().getResType().equals(TypeDescriptor.INT))
             node.getExpr().setResType(TypeDescriptor.FLOAT);
         else
             node.getExpr().setResType(TypeDescriptor.ERROR);
