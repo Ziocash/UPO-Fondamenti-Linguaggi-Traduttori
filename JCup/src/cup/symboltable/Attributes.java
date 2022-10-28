@@ -1,7 +1,5 @@
 package cup.symboltable;
 
-import ast.TypeDescriptor;
-
 /**
  * <p>
  * {@link SymbolTable} integration class.

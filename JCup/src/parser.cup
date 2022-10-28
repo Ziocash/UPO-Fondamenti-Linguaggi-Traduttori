@@ -8,7 +8,6 @@ package cup;
 import java_cup.runtime.*;
 import cup.Lexer;
 import cup.symboltable.*;
-import ast.TypeDescriptor;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.File;
