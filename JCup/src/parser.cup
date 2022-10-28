@@ -78,7 +78,7 @@ parser code {:
      * Checks if two {@link TypeDescriptor}s are compatible.
      * </p>
      * <p>
-     * Return {@code true} if types are compatible, otherwise {@code false}.
+     * Returns {@code true} if types are compatible, otherwise {@code false}.
      * </p>
      * 
      * @param t1 the variable type that will receive expression value.
@@ -90,35 +90,98 @@ parser code {:
                 && t1 != TypeDescriptor.ERROR && t2 != TypeDescriptor.ERROR;
     }
 
-	private TypeDescriptor getOperationDescriptor(TypeDescriptor t1, TypeDescriptor t2) {
-		if(!isCompatible(t1, t2))
+	/**
+     * <p>
+     * Adds an operator to generated code.
+     * </p>
+     * <p>
+     * Returns {@code ERROR} if types are incompatible, otherwise {@code INT} or {@code FLOAT} depending on operands.
+     * </p>
+     * 
+	 * @param operator the operator that needs to be added to code.
+     * @param t1 the variable type that will receive expression value.
+     * @param t2 the expression type that will be assigned to variable.
+     * @return {@code ERROR} if types are incompatible or already containing an error, otherwise {@code INT} or {@code FLOAT} depending on operands.
+     */
+	private TypeDescriptor appendOperation(String operator, TypeDescriptor t1, TypeDescriptor t2) {
+		if(!isCompatible(t1, t2)) {
+			logger.append(String.format("BinaryOperation: Incompatible types: \'%s\' and \'%s\'.%n", t1, t2));
 			return TypeDescriptor.ERROR;
-		else {
-			if(t1.equals(t2))
+		} else {
+			if(t1.equals(TypeDescriptor.INT)) {
+				code.append(operator);
+				insertSpace();
 				return t1;
-			else if(t2.equals(TypeDescriptor.INT))
+			} else {
+				code.append("5 k ");
+				code.append(operator);
+				insertSpace();
 				return TypeDescriptor.FLOAT;
+			}			
 		}
-		return TypeDescriptor.ERROR;
 	}
+
+	/**
+     * <p>
+     * Adds a value to generated code.
+     * </p>
+     * 
+	 * @param value the value that will be pushed into code
+     */
+	private void appendValue(String value) {
+		code.append(value);
+		insertSpace();
+	}
+
+	/**
+     * <p>
+     * Checks if a variable is already declared.
+     * </p>
+     * 
+	 * @param id variable id that needs to be checked.
+	 * @return {@code true} and adds an error to logger if a variable is already declared, otherwise {@code false}.
+     */
+	 private boolean declaredVariable(String id) {
+		if(SymbolTable.lookup(id) != null) {
+			logger.append(String.format("Declaration: variable \'%s\' already declared.%n", id));
+			return true;
+		}
+		return false;
+	 }
+
+	 /**
+     * <p>
+     * Checks if a variable is not declared.
+     * </p>
+     * 
+	 * @param id variable id that needs to be checked.
+	 * @return {@code true} and adds an error to logger if a variable is not declared, otherwise {@code false}.
+     */
+	 private boolean undeclaredVariable(String id) {
+		if(SymbolTable.lookup(id) == null) {
+			logger.append(String.format("Variable: variable \'%s\' is not declared.%n", id));
+			return true;
+		}
+		return false;
+	 }
 
 :}
 
 /* define how to connect to the scanner! */
 init with {:
-  SymbolTable.init();
-  code = new StringBuilder();
-  logger = new StringBuilder();
-  ComplexSymbolFactory f = new ComplexSymbolFactory();
-  symbolFactory = f;
-  File file = new File("C:\\Users\\Simone Gattini\\source\\repos\\UPO-Fondamenti-Linguaggi-Traduttori\\JCup\\data\\input.txt");
-  FileReader reader = null;
-  try {
-    reader = new FileReader(file);
-  } catch (IOException e) {
-    e.printStackTrace();
-  } 
-  lexer = new Lexer(f,reader);
+	SymbolTable.init();
+	code = new StringBuilder();
+	logger = new StringBuilder();
+	ComplexSymbolFactory f = new ComplexSymbolFactory();
+	symbolFactory = f;
+	File file = new File("C:\\Users\\Simone Gattini\\source\\repos\\UPO-Fondamenti-Linguaggi-Traduttori\\JCup\\data\\input.txt");
+	FileReader reader = null;
+	try {
+		reader = new FileReader(file);
+	} catch (IOException e) {
+		e.printStackTrace();
+	} 
+	lexer = new Lexer(f,reader);
 :};
 scan with {: return lexer.next_token(); :};
 
@@ -135,170 +198,81 @@ precedence right	PLUS, MINUS;
 precedence right   	TIMES, DIVIDE;
 
 /* The grammar rules */
-Prg	::=  DSs: dss {:RESULT = dss; :};
-DSs ::= Dcl : dcl DSs	{:RESULT = dcl; :}
-		| Stm : stm DSs 	{:RESULT = stm;:}
-		|					{: /*DO NOTHING*/:}
+Prg	::=  DSs: dss 				{: RESULT = dss; :};
+DSs ::= Dcl : dcl DSs			{: RESULT = dcl; :}
+		| Stm : stm DSs 		{: RESULT = stm; :}
+		|						{:    //no op    :} //This point is used for EOF
 		;
-		
-Dcl ::= TYFLOAT ID : id SEMI	{:if(SymbolTable.lookup(id) != null){
-										RESULT = TypeDescriptor.ERROR;
-										logger.append(
-                    String.format("Declaration: variable \'%s\' already declared.%n", id));
-									}else{
+
+// Declarations behaviour
+
+Dcl ::= TYFLOAT ID : id SEMI	{:
+									if(!declaredVariable(id)) {
 										SymbolTable.enter(id, new Attributes(TypeDescriptor.FLOAT));
 										RESULT = TypeDescriptor.FLOAT;
 										SymbolTable.lookup(id).setRegister(newRegister());
 									}
-								:}
-		| TYINT ID : id SEMI	{:if(SymbolTable.lookup(id) != null){
+									else
 										RESULT = TypeDescriptor.ERROR;
-															logger.append(
-                    String.format("Declaration: variable \'%s\' already declared.%n", id));
-									}else{
+								:}
+		| TYINT ID : id SEMI	{:
+									if(!declaredVariable(id)) {
 										SymbolTable.enter(id, new Attributes(TypeDescriptor.INT));
 										RESULT = TypeDescriptor.INT;
 										SymbolTable.lookup(id).setRegister(newRegister());
 									}
+									else
+										RESULT = TypeDescriptor.ERROR;
 								:}
 		;
+
+// Statements behaviour
 
 Stm ::= ID : id ASSIGN Exp : e SEMI		{:
-																		if (SymbolTable.lookup(id) == null) {
-            RESULT = TypeDescriptor.ERROR;
-            logger.append(String.format("Assignment: Cannot assign \'%s\' type to \'%s\' type.%n",
-                    e, SymbolTable.lookup(id).getType()));
-        } else {
-            if (isCompatible(SymbolTable.lookup(id).getType(), e)) {
-				RESULT = SymbolTable.lookup(id).getType();
-				char s = SymbolTable.lookup(id).getRegister();
-				code.append("s" + s);
-				insertSpace();
-				code.append("0 k");
-				insertSpace();
-            } else {
-				logger.append(String.format(
-                            "BinaryOperation: Expected type FLOAT and INT for expressions, but was \'%s\' and \'%s\'.%n",
-                            SymbolTable.lookup(id).getType(), e));
-                    RESULT = TypeDescriptor.ERROR;
-            }
-        }
-										:}
-		| PRINT ID : id SEMI	{: 
-		
-								if (SymbolTable.lookup(id) == null) {
-												logger.append(String.format("Variable: variable \'%s\' is not declared.%n", id));
-												RESULT = TypeDescriptor.ERROR;
-											} else {
-												code.append("l" + SymbolTable.lookup(id).getRegister() + " p P ");
-												RESULT = SymbolTable.lookup(id).getType();
+											if(!undeclaredVariable(id)) {
+												if (isCompatible(SymbolTable.lookup(id).getType(), e)) {
+													RESULT = SymbolTable.lookup(id).getType();
+													char s = SymbolTable.lookup(id).getRegister();
+													code.append("s" + s);
+													insertSpace();
+													code.append("0 k");
+													insertSpace();
+												} else {
+													logger.append(String.format("BinaryOperation: Expected type FLOAT and INT for expressions, but was \'%s\' and \'%s\'.%n", SymbolTable.lookup(id).getType(), e));
+													RESULT = TypeDescriptor.ERROR;
+												}
 											}
-											:}
-		;	
-
-Exp ::= Exp : e1 PLUS Exp : e2	{: if(!isCompatible(e1, e2)){
-										RESULT = TypeDescriptor.ERROR;
-										logger.append(String.format(
-                            "BinaryOperation: Incompatible types: \'%s\' and \'%s\'.%n",
-                            e1, e2));
-									} else {
-										if(e1.equals(TypeDescriptor.INT)){
-											RESULT = e1;
-											code.append("+ ");
-										} else {
-											RESULT = TypeDescriptor.FLOAT;
-											code.append("5 k ");
-											code.append("+ ");
-										}
-									}
-
-								:}
-		| Exp : e1 MINUS Exp : e2	{: if(e1.equals(TypeDescriptor.ERROR) || e2.equals(TypeDescriptor.ERROR)){
-										RESULT = TypeDescriptor.ERROR;
-										logger.append(String.format(
-                            "BinaryOperation: Incompatible types: \'%s\' and \'%s\'.%n",
-                            e1, e2));
-									}else if(e1 == e2){
-										RESULT = e1;
-										code.append("-");
-										insertSpace();
-									}else{
-										if(e1 == TypeDescriptor.INT){
-											logger.append(String.format(
-                            "BinaryOperation: Expected type FLOAT and INT for expressions, but was \'%s\' and \'%s\'.%n",
-                            e1, e2));
-											RESULT = TypeDescriptor.ERROR;
-										}else{
-											RESULT = TypeDescriptor.FLOAT;
-											code.append("5 k");
-											insertSpace();
-											code.append("-");
-											insertSpace();
-										}
-									}
-
-								:}
-		| Exp : e1 DIVIDE Exp : e2 	{: if(e1.equals(TypeDescriptor.ERROR) || e2.equals(TypeDescriptor.ERROR)){
-										RESULT = TypeDescriptor.ERROR;
-										logger.append(String.format(
-                            "BinaryOperation: Incompatible types: \'%s\' and \'%s\'.%n",
-                            e1, e2));
-									}else if(e1 == e2){
-										RESULT = e1;
-										code.append("/");
-										insertSpace();
-									}else{
-										if(e1 == TypeDescriptor.INT){
-											logger.append(String.format(
-                            "BinaryOperation: Incompatible types: \'%s\' and \'%s\'.%n",
-                            e1, e2));
-											RESULT = TypeDescriptor.ERROR;
-										}else{
-											RESULT = TypeDescriptor.FLOAT;
-											code.append("5 k");
-											insertSpace();
-											code.append("/");
-											insertSpace();
-										}
-									}
-
-								:}
-		| Exp : e1 TIMES Exp : e2 	{: if(e1.equals(TypeDescriptor.ERROR) || e2.equals(TypeDescriptor.ERROR)){
-										RESULT = TypeDescriptor.ERROR;
-										logger.append(String.format(
-                            "BinaryOperation: Incompatible types: \'%s\' and \'%s\'.%n",
-                            e1, e2));
-									}else if(e1 == e2){
-										RESULT = e1;
-										code.append("*");
-										insertSpace();
-									}else{
-										if(e1 == TypeDescriptor.INT){
-											logger.append(String.format(
-                            "BinaryOperation: Incompatible types: \'%s\' and \'%s\'.%n",
-                            e1, e2));
-											RESULT = TypeDescriptor.ERROR;
-										}else{
-											RESULT = TypeDescriptor.FLOAT;
-											code.append("5 k");
-											insertSpace();
-											code.append("*");
-											insertSpace();
-										}
+											else
+												RESULT = TypeDescriptor.ERROR;
+										:}
+		| PRINT ID : id SEMI	{:
+									if(!undeclaredVariable(id)) {
+										code.append("l" + SymbolTable.lookup(id).getRegister() + " p P ");
+										RESULT = SymbolTable.lookup(id).getType();
 									}
 								:}
-		| Val : v	{:RESULT = v;:}
 		;
-		
-Val ::= INT : i 	{:	RESULT = TypeDescriptor.INT;
-				  		code.append(i); insertSpace(); :}
-		| FLOAT : f 	{:	RESULT = TypeDescriptor.FLOAT;
-					  		code.append(f);insertSpace(); :}
-		| ID : id 	{:	if(SymbolTable.lookup(id) == null){
-			   				RESULT = TypeDescriptor.ERROR;
-							logger.append(String.format("Variable: variable \'%s\' is not declared.%n", id));
-			  			} else RESULT = SymbolTable.lookup(id).getType();
-						code.append("l" + SymbolTable.lookup(id).getRegister());
-						insertSpace();
-				:}
+
+// Expression evaluation
+
+Exp ::= Exp : e1 PLUS Exp : e2			{: RESULT = appendOperation("+", e1, e2); :}
+		| Exp : e1 MINUS Exp : e2		{: RESULT = appendOperation("-", e1, e2); :}
+		| Exp : e1 DIVIDE Exp : e2 		{: RESULT = appendOperation("/", e1, e2); :}
+		| Exp : e1 TIMES Exp : e2 		{: RESULT = appendOperation("*", e1, e2); :}
+		| Val : v						{: RESULT = v; :}
+		;
+
+// Value evalution between INT FLOAT and ID
+
+Val ::= INT : i 						{:	RESULT = TypeDescriptor.INT; appendValue(i); :}
+		| FLOAT : f 					{:	RESULT = TypeDescriptor.FLOAT; appendValue(f); :}
+		| ID : id 						{:	
+											if(!undeclaredVariable(id)) { 
+												RESULT = SymbolTable.lookup(id).getType();
+												code.append("l" + SymbolTable.lookup(id).getRegister());
+												insertSpace();
+											}
+											else
+												RESULT = TypeDescriptor.ERROR;
+										:}
 		;
