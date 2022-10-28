@@ -198,32 +198,32 @@ precedence right	PLUS, MINUS;
 precedence right   	TIMES, DIVIDE;
 
 /* The grammar rules */
-Prg	::=  DSs: dss 				{: RESULT = dss; :};
-DSs ::= Dcl : dcl DSs			{: RESULT = dcl; :}
-		| Stm : stm DSs 		{: RESULT = stm; :}
-		|						{:    //no op    :} //This point is used for EOF
+Prg	::=  DSs: dss 						{: RESULT = dss; :};
+DSs ::= Dcl : dcl DSs					{: RESULT = dcl; :}
+		| Stm : stm DSs 				{: RESULT = stm; :}
+		|								{:    //no op    :} //This point is used for EOF
 		;
 
 // Declarations behaviour
 
-Dcl ::= TYFLOAT ID : id SEMI	{:
-									if(!declaredVariable(id)) {
-										SymbolTable.enter(id, new Attributes(TypeDescriptor.FLOAT));
-										RESULT = TypeDescriptor.FLOAT;
-										SymbolTable.lookup(id).setRegister(newRegister());
-									}
-									else
-										RESULT = TypeDescriptor.ERROR;
-								:}
-		| TYINT ID : id SEMI	{:
-									if(!declaredVariable(id)) {
-										SymbolTable.enter(id, new Attributes(TypeDescriptor.INT));
-										RESULT = TypeDescriptor.INT;
-										SymbolTable.lookup(id).setRegister(newRegister());
-									}
-									else
-										RESULT = TypeDescriptor.ERROR;
-								:}
+Dcl ::= TYFLOAT ID : id SEMI			{:
+											if(!declaredVariable(id)) {
+												SymbolTable.enter(id, new Attributes(TypeDescriptor.FLOAT));
+												RESULT = TypeDescriptor.FLOAT;
+												SymbolTable.lookup(id).setRegister(newRegister());
+											}
+											else
+												RESULT = TypeDescriptor.ERROR;
+										:}
+		| TYINT ID : id SEMI			{:
+											if(!declaredVariable(id)) {
+												SymbolTable.enter(id, new Attributes(TypeDescriptor.INT));
+												RESULT = TypeDescriptor.INT;
+												SymbolTable.lookup(id).setRegister(newRegister());
+											}
+											else
+												RESULT = TypeDescriptor.ERROR;
+										:}
 		;
 
 // Statements behaviour
@@ -245,12 +245,12 @@ Stm ::= ID : id ASSIGN Exp : e SEMI		{:
 											else
 												RESULT = TypeDescriptor.ERROR;
 										:}
-		| PRINT ID : id SEMI	{:
-									if(!undeclaredVariable(id)) {
-										code.append("l" + SymbolTable.lookup(id).getRegister() + " p P ");
-										RESULT = SymbolTable.lookup(id).getType();
-									}
-								:}
+		| PRINT ID : id SEMI			{:
+											if(!undeclaredVariable(id)) {
+												code.append("l" + SymbolTable.lookup(id).getRegister() + " p P ");
+												RESULT = SymbolTable.lookup(id).getType();
+											}
+										:}
 		;
 
 // Expression evaluation
