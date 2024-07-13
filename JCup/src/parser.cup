@@ -11,6 +11,7 @@ import cup.symboltable.*;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.File;
+import javax.swing.JFileChooser;
 
 parser code {:
 
@@ -173,11 +174,16 @@ init with {:
 	logger = new StringBuilder();
 	ComplexSymbolFactory f = new ComplexSymbolFactory();
 	symbolFactory = f;
-	File file = new File("C:\\Users\\Simone Gattini\\source\\repos\\UPO-Fondamenti-Linguaggi-Traduttori\\JCup\\data\\input.txt");
 	FileReader reader = null;
 	try {
+		JFileChooser chooser = new JFileChooser(new File(".").getCanonicalPath());
+		int value = chooser.showOpenDialog(null);
+		File file = null;
+		if(value == JFileChooser.APPROVE_OPTION) {
+			file = new File(chooser.getSelectedFile().getAbsolutePath());
+		}
 		reader = new FileReader(file);
-	} catch (IOException e) {
+	} catch (Exception e) {
 		e.printStackTrace();
 	} 
 	lexer = new Lexer(f,reader);

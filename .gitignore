@@ -25,3 +25,6 @@ hs_err_pid*
 # .vscode subfolder
 .vscode/
 CompilatoreAcDc/src/test/data/output.txt
+JCup/src/cup/Symbols.java
+JCup/src/cup/Lexer.java
+JCup/src/cup/Parser.java
