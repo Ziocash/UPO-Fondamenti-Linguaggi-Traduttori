@@ -17,4 +17,9 @@ public class NodeConvert extends NodeExpr {
     public void accept(IVisitor visitor) {
         visitor.visit(this);
     }
+
+    @Override
+    public String toString() {
+        return "[Convert:FLOAT," + expr.toString() + "]" ;
+    }
 }

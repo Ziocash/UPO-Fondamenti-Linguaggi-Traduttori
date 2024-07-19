@@ -39,7 +39,4 @@ public class Token {
 		builder = value != null ? builder.append(","+value+">") : builder.append(">");
 		return builder.toString();
 	}
-
-     
-
 }
