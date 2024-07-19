@@ -179,9 +179,11 @@ public class Parser {
     }
 
     /**
+     * Parse expression for Exp non-terminal
      * 
-     * @return
-     * @throws SyntacticException
+     * @return NodeExpr representing the visited expression
+     * @throws SyntacticException Exception thrown when expected {@code TokenType}
+     *                            does not respect syntax
      */
     private NodeExpr parseExp() throws SyntacticException {
         Token token = null;
@@ -203,10 +205,12 @@ public class Parser {
     }
 
     /**
+     * Parse expression (PLUS and MINUS)
      * 
-     * @param leftOp
-     * @return
-     * @throws SyntacticException
+     * @param leftOp Left operation to keep track of
+     * @return NodeExpr representing the current expression
+     * @throws SyntacticException Exception thrown when expected {@code TokenType}
+     *                            does not respect syntax
      */
     private NodeExpr parseExpP(NodeExpr leftOp) throws SyntacticException {
         Token token = null;
@@ -236,9 +240,13 @@ public class Parser {
     }
 
     /**
+     * Parsing Tr non-terminal representing DIVIDE or TIMES operations (higher precedence)
      * 
-     * @return
-     * @throws SyntacticException
+     * @return an object representing complete expression tree
+     * @throws SyntacticException Exception thrown when expected {@code TokenType}
+     *                            does not respect syntax
+     * 
+     * @see TokenType
      */
     private NodeExpr parseTr() throws SyntacticException {
         Token token = null;
@@ -260,10 +268,12 @@ public class Parser {
     }
 
     /**
+     * Parsing TrP non-terminal 
      * 
-     * @param leftOp
-     * @return
-     * @throws SyntacticException
+     * @param leftOp Left operation to keep track of
+     * @return NodeExpr representing a complete AST for the given expression
+     * @throws SyntacticException Exception thrown when expected {@code TokenType}
+     *                            does not respect syntax
      */
     private NodeExpr parseTrP(NodeExpr leftOp) throws SyntacticException {
         Token token = null;
@@ -295,9 +305,11 @@ public class Parser {
     }
 
     /**
+     * Parse Val 
      * 
-     * @return
-     * @throws SyntacticException
+     * @return an object representing a constant value or a dereferenced variable value
+     * @throws SyntacticException Exception thrown when expected {@code TokenType}
+     *                            does not respect syntax
      */
     private NodeExpr parseVal() throws SyntacticException {
         Token token = null;
@@ -330,7 +342,7 @@ public class Parser {
      * @throws SyntacticException Exception thrown when expected {@code TokenType}
      *                            is not equal to actual token type
      */
-    Token match(TokenType type) throws SyntacticException {
+    private Token match(TokenType type) throws SyntacticException {
         Token token;
         try {
             token = scanner.peekToken();
